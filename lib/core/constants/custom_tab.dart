@@ -3,7 +3,7 @@ import '../utils/base_eport.dart';
 class CustomTab extends StatelessWidget {
   final String title;
 
-  const CustomTab({required this.title});
+  const CustomTab({super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {
