@@ -1,5 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import '../../domain/entities/breed_entity.dart';
 import '../../domain/usecases/cache_breeds_usecase.dart';
 import '../../domain/usecases/get_breeds_usecase.dart';
@@ -53,7 +52,6 @@ class BreedsBloc extends Bloc<BreedsEvent, BreedsState> {
           hasCachedData = true;
           _allBreeds = cachedBreeds;
 
-          // emit(BreedsLoaded(breeds: _allBreeds, hasMore: _hasMore));
           _applyCurrentFilter(emit);
         }
       },
@@ -79,7 +77,6 @@ class BreedsBloc extends Bloc<BreedsEvent, BreedsState> {
 
         cacheBreedsUseCase(_allBreeds);
 
-        // emit(BreedsLoaded(breeds: _allBreeds, hasMore: _hasMore));
         _applyCurrentFilter(emit);
       },
     );
@@ -109,7 +106,6 @@ class BreedsBloc extends Bloc<BreedsEvent, BreedsState> {
         _currentPage = paginatedResult.currentPage;
         _hasMore = paginatedResult.hasNextPage;
 
-        // emit(BreedsLoaded(breeds: _allBreeds, hasMore: _hasMore));
         _applyCurrentFilter(emit);
       },
     );
@@ -137,39 +133,11 @@ class BreedsBloc extends Bloc<BreedsEvent, BreedsState> {
 
         cacheBreedsUseCase(_allBreeds);
 
-        // emit(BreedsLoaded(breeds: _allBreeds, hasMore: _hasMore));
         _applyCurrentFilter(emit);
       },
     );
   }
 
-  // Future<void> _onSearchBreeds(
-  //   SearchBreedsEvent event,
-  //   Emitter<BreedsState> emit,
-  // ) async {
-  //   final query = event.query;
-
-  //   if (query.isEmpty) {
-  //     emit(
-  //       BreedsLoaded(breeds: _allBreeds, hasMore: _hasMore, searchQuery: ''),
-  //     );
-  //     return;
-  //   }
-
-  //   final filteredBreeds = _allBreeds
-  //       .where(
-  //         (breed) => breed.name.toLowerCase().contains(query.toLowerCase()),
-  //       )
-  //       .toList();
-
-  //   emit(
-  //     BreedsLoaded(
-  //       breeds: filteredBreeds,
-  //       hasMore: _hasMore,
-  //       searchQuery: query,
-  //     ),
-  //   );
-  // }
   Future<void> _onSearchBreeds(
     SearchBreedsEvent event,
     Emitter<BreedsState> emit,
@@ -232,13 +200,6 @@ class BreedsBloc extends Bloc<BreedsEvent, BreedsState> {
     );
   }
 
-  // /// Handles clearing the search — restores the full unfiltered breed list.
-  // Future<void> _onClearSearch(
-  //   ClearSearchEvent event,
-  //   Emitter<BreedsState> emit,
-  // ) async {
-  //   emit(BreedsLoaded(breeds: _allBreeds, hasMore: _hasMore, searchQuery: ''));
-  // }
   Future<void> _onClearSearch(
     ClearSearchEvent event,
     Emitter<BreedsState> emit,

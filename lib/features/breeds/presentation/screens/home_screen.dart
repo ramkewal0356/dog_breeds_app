@@ -21,12 +21,18 @@ class HomeScreen extends StatelessWidget {
       },
       child: Scaffold(
         appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.primary,
           title: BlocBuilder<AuthBloc, AuthState>(
             builder: (context, state) {
               final username = state is AuthAuthenticated
                   ? state.user.username
                   : '';
-              return Text('Hi, $username');
+              return Text(
+                'Hi, $username',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onPrimary,
+                ),
+              );
             },
           ),
           actions: [
@@ -37,7 +43,10 @@ class HomeScreen extends StatelessWidget {
                     state is ThemeLoaded && state.mode == ThemeMode.dark;
                 return IconButton(
                   key: const Key('theme_toggle_button'),
-                  icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode),
+                  icon: Icon(
+                    isDark ? Icons.light_mode : Icons.dark_mode,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
                   tooltip: isDark
                       ? 'Switch to light mode'
                       : 'Switch to dark mode',
@@ -50,7 +59,10 @@ class HomeScreen extends StatelessWidget {
             // Logout button
             IconButton(
               key: const Key('logout_button'),
-              icon: const Icon(Icons.logout),
+              icon: Icon(
+                Icons.logout,
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
               tooltip: 'Logout',
               onPressed: () {
                 _showLogoutDialog(context);

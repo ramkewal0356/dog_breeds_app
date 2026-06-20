@@ -5,6 +5,7 @@ import 'package:dog_breed_app/features/breeds/presentation/widgets/filter_tab_ba
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/constants/custom_snackbar.dart';
 import '../../../../core/network/connectivity_service.dart';
 import '../../../../injection.dart';
 import '../../domain/entities/breed_entity.dart';
@@ -23,27 +24,48 @@ class BreedListWidget extends StatefulWidget {
 
 class _BreedListWidgetState extends State<BreedListWidget> {
   final ScrollController _scrollController = ScrollController();
-
+  final TextEditingController _searchController = TextEditingController();
+  bool _wasConnected = true;
   @override
   void initState() {
     super.initState();
-
     _scrollController.addListener(_onScroll);
     context.read<BreedsBloc>().add(const FetchBreedsEvent());
+    sl<ConnectivityService>().isConnectedNotifier.addListener(
+      _onConnectivityChanged,
+    );
   }
 
-  final TextEditingController _searchController = TextEditingController();
-
+  ///dispose///
   @override
   void dispose() {
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
+
+    sl<ConnectivityService>().isConnectedNotifier.removeListener(
+      _onConnectivityChanged,
+    );
+    _searchController.dispose();
     super.dispose();
   }
 
   void _onScroll() {
     if (_isNearBottom) {
       context.read<BreedsBloc>().add(const FetchNextPageEvent());
+    }
+  }
+
+  void _onConnectivityChanged() {
+    if (!mounted) return;
+
+    final connected = sl<ConnectivityService>().isConnectedNotifier.value;
+
+    if (!connected && _wasConnected) {
+      _wasConnected = false;
+      AppToast.showError("You're offline");
+    } else if (connected && !_wasConnected) {
+      _wasConnected = true;
+      AppToast.showSuccess("Internet Connected");
     }
   }
 
@@ -55,16 +77,19 @@ class _BreedListWidgetState extends State<BreedListWidget> {
   }
 
   Future<void> _onRefresh() async {
+    final connected = await sl<ConnectivityService>().isConnected;
+
+    if (!connected) {
+      AppToast.showError("You're offline");
+      return;
+    }
     setState(() {
       _searchController.clear();
     });
     FocusManager.instance.primaryFocus?.unfocus();
-
     context.read<BreedsBloc>().add(const ClearSearchEvent());
     context.read<BreedsBloc>().add(const FetchBreedsEvent());
-
     context.read<BreedsBloc>().add(const RefreshBreedsEvent());
-
     // Clear search results
     context.read<BreedsBloc>().add(const ClearSearchEvent());
     // Wait for the bloc to emit a non-loading state
@@ -80,73 +105,52 @@ class _BreedListWidgetState extends State<BreedListWidget> {
         BreedSearchBar(controller: _searchController),
         BreedFilterTabBar(),
         Expanded(
-          child: ValueListenableBuilder<bool>(
-            valueListenable: sl<ConnectivityService>().isConnectedNotifier,
-            builder: (context, isConnected, _) {
-              if (!isConnected) {
+          child: BlocBuilder<BreedsBloc, BreedsState>(
+            builder: (context, state) {
+              if (state is BreedsLoading) {
+                return const _LoadingWidget();
+              }
+
+              if (state is BreedsEmpty) {
                 return RefreshIndicator(
                   onRefresh: _onRefresh,
                   child: ListView(
                     physics: const AlwaysScrollableScrollPhysics(),
                     children: [
                       SizedBox(
-                        height: MediaQuery.of(context).size.height * .7,
-                        child: const NoInternetWidget(),
+                        height: MediaQuery.of(context).size.height * 0.7,
+                        child: const _EmptyStateWidget(),
                       ),
                     ],
                   ),
                 );
               }
-              return BlocBuilder<BreedsBloc, BreedsState>(
-                builder: (context, state) {
-                  if (state is BreedsLoading) {
-                    return const _LoadingWidget();
-                  }
 
-                  if (state is BreedsEmpty) {
-                    return RefreshIndicator(
-                      onRefresh: _onRefresh,
-                      child: ListView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        children: [
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.7,
-                            child: const _EmptyStateWidget(),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
+              if (state is BreedsError) {
+                return RefreshIndicator(
+                  onRefresh: _onRefresh,
+                  child: _ErrorWidget(
+                    message: state.message,
+                    onRetry: () {
+                      context.read<BreedsBloc>().add(const FetchBreedsEvent());
+                    },
+                  ),
+                );
+              }
 
-                  if (state is BreedsError) {
-                    return RefreshIndicator(
-                      onRefresh: _onRefresh,
-                      child: _ErrorWidget(
-                        message: state.message,
-                        onRetry: () {
-                          context.read<BreedsBloc>().add(
-                            const FetchBreedsEvent(),
-                          );
-                        },
-                      ),
-                    );
-                  }
+              if (state is BreedsLoaded) {
+                return _buildBreedList(state.breeds, state.hasMore);
+              }
 
-                  if (state is BreedsLoaded) {
-                    return _buildBreedList(state.breeds, state.hasMore);
-                  }
+              if (state is BreedsLoadingMore) {
+                return _buildBreedList(
+                  state.currentBreeds,
+                  true,
+                  isLoadingMore: true,
+                );
+              }
 
-                  if (state is BreedsLoadingMore) {
-                    return _buildBreedList(
-                      state.currentBreeds,
-                      true,
-                      isLoadingMore: true,
-                    );
-                  }
-
-                  return const SizedBox.shrink();
-                },
-              );
+              return const SizedBox.shrink();
             },
           ),
         ),
