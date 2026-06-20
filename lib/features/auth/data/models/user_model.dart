@@ -1,15 +1,10 @@
 import 'package:dog_breed_app/features/auth/domain/entities/user_entity.dart';
 
-/// Data model for user authentication.
-/// Handles serialization to/from Hive storage maps and mapping to the domain entity.
 class UserModel {
   final String username;
   final String passwordHash;
 
-  const UserModel({
-    required this.username,
-    required this.passwordHash,
-  });
+  const UserModel({required this.username, required this.passwordHash});
 
   /// Creates a [UserModel] from a Hive storage map.
   factory UserModel.fromHiveMap(Map<String, dynamic> map) {
@@ -29,18 +24,12 @@ class UserModel {
 
   /// Converts this model to a map suitable for Hive storage.
   Map<String, dynamic> toHiveMap() {
-    return {
-      'username': username,
-      'passwordHash': passwordHash,
-    };
+    return {'username': username, 'passwordHash': passwordHash};
   }
 
   /// Converts this model to a domain [UserEntity].
   UserEntity toEntity() {
-    return UserEntity(
-      username: username,
-      passwordHash: passwordHash,
-    );
+    return UserEntity(username: username, passwordHash: passwordHash);
   }
 
   @override

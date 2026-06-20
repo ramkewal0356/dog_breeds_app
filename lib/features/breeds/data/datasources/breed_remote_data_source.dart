@@ -3,8 +3,6 @@ import 'package:dio/dio.dart';
 import '../../../../core/error/exceptions.dart';
 import '../models/paginated_breed_response.dart';
 
-/// Abstract interface for the breed remote data source.
-/// Fetches breed data from the Dog Breeds public API.
 abstract class BreedRemoteDataSource {
   Future<PaginatedBreedResponse> getBreeds({
     required int page,
@@ -12,7 +10,6 @@ abstract class BreedRemoteDataSource {
   });
 }
 
-/// Implementation of [BreedRemoteDataSource] using Dio HTTP client.
 class BreedRemoteDataSourceImpl implements BreedRemoteDataSource {
   final Dio dio;
 

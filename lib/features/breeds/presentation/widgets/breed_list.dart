@@ -1,19 +1,9 @@
-import 'dart:async';
+import 'package:dog_breed_app/features/breeds/presentation/bloc/breeds_event.dart';
+import 'package:dog_breed_app/features/breeds/presentation/bloc/breeds_state.dart';
+import 'package:dog_breed_app/features/breeds/presentation/widgets/breed_card.dart';
+import 'package:dog_breed_app/features/breeds/presentation/widgets/breed_search_bar.dart';
 
-import 'package:dog_breed_app/core/constants/no_internet_widget.dart';
-import 'package:dog_breed_app/features/breeds/presentation/widgets/filter_tab_bar.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../../../core/constants/custom_snackbar.dart';
-import '../../../../core/network/connectivity_service.dart';
-import '../../../../injection.dart';
-import '../../domain/entities/breed_entity.dart';
-import '../bloc/breeds_bloc.dart';
-import '../bloc/breeds_event.dart';
-import '../bloc/breeds_state.dart';
-import 'breed_card.dart';
-import 'breed_search_bar.dart';
+import '../../../../core/utils/base_eport.dart';
 
 class BreedListWidget extends StatefulWidget {
   const BreedListWidget({super.key});
@@ -78,24 +68,13 @@ class _BreedListWidgetState extends State<BreedListWidget> {
 
   Future<void> _onRefresh() async {
     final connected = await sl<ConnectivityService>().isConnected;
-
     if (!connected) {
       AppToast.showError("You're offline");
       return;
     }
-    setState(() {
-      _searchController.clear();
-    });
     FocusManager.instance.primaryFocus?.unfocus();
-    context.read<BreedsBloc>().add(const ClearSearchEvent());
-    context.read<BreedsBloc>().add(const FetchBreedsEvent());
     context.read<BreedsBloc>().add(const RefreshBreedsEvent());
-    // Clear search results
-    context.read<BreedsBloc>().add(const ClearSearchEvent());
-    // Wait for the bloc to emit a non-loading state
-    await context.read<BreedsBloc>().stream.firstWhere(
-      (state) => state is! BreedsLoading,
-    );
+    await Future.delayed(const Duration(milliseconds: 500));
   }
 
   @override

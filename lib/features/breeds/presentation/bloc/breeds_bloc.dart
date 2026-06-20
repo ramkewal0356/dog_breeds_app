@@ -1,4 +1,7 @@
+import 'package:dog_breed_app/core/constants/custom_snackbar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/network/connectivity_service.dart';
+import '../../../../injection.dart';
 import '../../domain/entities/breed_entity.dart';
 import '../../domain/usecases/cache_breeds_usecase.dart';
 import '../../domain/usecases/get_breeds_usecase.dart';
@@ -89,7 +92,12 @@ class BreedsBloc extends Bloc<BreedsEvent, BreedsState> {
     if (!_hasMore) return;
 
     if (state is! BreedsLoaded) return;
+    final connected = await sl<ConnectivityService>().isConnected;
 
+    if (!connected) {
+      AppToast.showError("You're offline");
+      return;
+    }
     emit(BreedsLoadingMore(currentBreeds: _allBreeds));
 
     final result = await getBreedsUseCase(
@@ -115,6 +123,17 @@ class BreedsBloc extends Bloc<BreedsEvent, BreedsState> {
     RefreshBreedsEvent event,
     Emitter<BreedsState> emit,
   ) async {
+    final connected = await sl<ConnectivityService>().isConnected;
+
+    if (!connected) {
+      AppToast.showError("You're offline");
+
+      if (_allBreeds.isNotEmpty) {
+        _applyCurrentFilter(emit);
+      }
+
+      return;
+    }
     final result = await getBreedsUseCase(const GetBreedsParams(page: 1));
 
     result.fold(
@@ -157,7 +176,6 @@ class BreedsBloc extends Bloc<BreedsEvent, BreedsState> {
   void _applyCurrentFilter(Emitter<BreedsState> emit) {
     List<BreedEntity> filteredBreeds = List.from(_allBreeds);
 
-    // TAB FILTER
     switch (_selectedTabIndex) {
       case 1:
         // Hypoallergenic
@@ -167,11 +185,42 @@ class BreedsBloc extends Bloc<BreedsEvent, BreedsState> {
         break;
 
       case 2:
+        // Small Dogs (<=10kg)
+        filteredBreeds = filteredBreeds
+            .where((breed) => breed.maleWeight.max <= 10)
+            .toList();
+        break;
+
+      case 3:
+        // Medium Dogs (11-25kg)
+        filteredBreeds = filteredBreeds
+            .where(
+              (breed) =>
+                  breed.maleWeight.max > 10 && breed.maleWeight.max <= 25,
+            )
+            .toList();
+        break;
+
+      case 4:
+        // Large Dogs (>25kg)
+        filteredBreeds = filteredBreeds
+            .where((breed) => breed.maleWeight.max > 25)
+            .toList();
+        break;
+
+      case 5:
+        // Short Life (<15 years)
+        filteredBreeds = filteredBreeds
+            .where((breed) => breed.lifeSpan.max < 15)
+            .toList();
+        break;
+
+      case 7:
         // A-Z
         filteredBreeds.sort((a, b) => a.name.compareTo(b.name));
         break;
 
-      case 3:
+      case 8:
         // Z-A
         filteredBreeds.sort((a, b) => b.name.compareTo(a.name));
         break;
@@ -179,7 +228,6 @@ class BreedsBloc extends Bloc<BreedsEvent, BreedsState> {
       default:
         filteredBreeds = List.from(_allBreeds);
     }
-
     // SEARCH FILTER
     if (_searchQuery.isNotEmpty) {
       filteredBreeds = filteredBreeds.where((breed) {

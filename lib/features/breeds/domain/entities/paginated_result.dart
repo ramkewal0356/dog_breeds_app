@@ -1,7 +1,5 @@
 import 'package:equatable/equatable.dart';
 
-/// A generic paginated result container used across the domain layer.
-/// Wraps a list of items with pagination metadata.
 class PaginatedResult<T> extends Equatable {
   final List<T> items;
   final int currentPage;

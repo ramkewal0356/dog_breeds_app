@@ -1,7 +1,5 @@
 import 'package:equatable/equatable.dart';
 
-/// Represents an authenticated user in the domain layer.
-/// Uses Equatable for value-based equality comparison.
 class UserEntity extends Equatable {
   final String username;
   final String passwordHash;

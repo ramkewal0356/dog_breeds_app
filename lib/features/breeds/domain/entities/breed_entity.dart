@@ -1,7 +1,5 @@
 import 'package:equatable/equatable.dart';
 
-/// Represents a dog breed in the domain layer.
-/// Contains all breed attributes displayed to the user.
 class BreedEntity extends Equatable {
   final String id;
   final String name;
@@ -23,14 +21,14 @@ class BreedEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        name,
-        description,
-        lifeSpan,
-        maleWeight,
-        femaleWeight,
-        hypoallergenic,
-      ];
+    id,
+    name,
+    description,
+    lifeSpan,
+    maleWeight,
+    femaleWeight,
+    hypoallergenic,
+  ];
 }
 
 /// Represents the life span range of a breed in years.
@@ -38,10 +36,7 @@ class LifeSpan extends Equatable {
   final int min;
   final int max;
 
-  const LifeSpan({
-    required this.min,
-    required this.max,
-  });
+  const LifeSpan({required this.min, required this.max});
 
   @override
   List<Object?> get props => [min, max];
@@ -52,10 +47,7 @@ class Weight extends Equatable {
   final double min;
   final double max;
 
-  const Weight({
-    required this.min,
-    required this.max,
-  });
+  const Weight({required this.min, required this.max});
 
   @override
   List<Object?> get props => [min, max];

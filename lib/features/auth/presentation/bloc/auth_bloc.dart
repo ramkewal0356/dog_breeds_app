@@ -21,9 +21,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<LoginEvent>(_onLogin);
     on<LogoutEvent>(_onLogout);
   }
-
-  /// Handles session check on app startup.
-  /// Emits [AuthAuthenticated] if a session exists, [AuthUnauthenticated] otherwise.
   Future<void> _onCheckSession(
     CheckSessionEvent event,
     Emitter<AuthState> emit,
@@ -66,8 +63,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
   }
 
-  /// Handles logout.
-  /// Calls the logout use case and emits [AuthUnauthenticated].
   Future<void> _onLogout(LogoutEvent event, Emitter<AuthState> emit) async {
     final result = await logoutUseCase();
 

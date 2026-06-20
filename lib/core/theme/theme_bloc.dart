@@ -4,9 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:dog_breed_app/core/theme/theme_repository.dart';
 
-// --- Events ---
-
-/// Base class for all theme events.
 abstract class ThemeEvent extends Equatable {
   const ThemeEvent();
 
@@ -24,9 +21,6 @@ class ToggleThemeEvent extends ThemeEvent {
   const ToggleThemeEvent();
 }
 
-// --- States ---
-
-/// Base class for all theme states.
 abstract class ThemeState extends Equatable {
   const ThemeState();
 
@@ -44,24 +38,15 @@ class ThemeLoaded extends ThemeState {
   List<Object?> get props => [mode];
 }
 
-// --- Bloc ---
-
-/// Bloc that manages the application's theme state.
-///
-/// Handles:
-/// - [LoadThemeEvent]: Loads the persisted theme preference from storage.
-/// - [ToggleThemeEvent]: Toggles between light and dark themes.
 class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
   final ThemeRepository themeRepository;
 
   ThemeBloc({required this.themeRepository})
-      : super(const ThemeLoaded(ThemeMode.system)) {
+    : super(const ThemeLoaded(ThemeMode.system)) {
     on<LoadThemeEvent>(_onLoadTheme);
     on<ToggleThemeEvent>(_onToggleTheme);
   }
 
-  /// Loads the theme preference from the repository.
-  /// Emits [ThemeLoaded] with the stored mode, defaulting to [ThemeMode.system].
   Future<void> _onLoadTheme(
     LoadThemeEvent event,
     Emitter<ThemeState> emit,
@@ -74,8 +59,6 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
     );
   }
 
-  /// Toggles the theme between light and dark.
-  /// Persists the new preference to storage.
   Future<void> _onToggleTheme(
     ToggleThemeEvent event,
     Emitter<ThemeState> emit,

@@ -22,3 +22,10 @@ export 'package:dog_breed_app/features/auth/data/datasources/auth_local_data_sou
 export 'package:dog_breed_app/features/auth/data/models/user_model.dart';
 export 'package:dog_breed_app/features/auth/domain/entities/user_entity.dart';
 export 'package:dog_breed_app/features/auth/domain/repositories/auth_repository.dart';
+export 'dart:async';
+
+export 'package:dog_breed_app/features/breeds/presentation/widgets/filter_tab_bar.dart';
+
+export '../../../../core/constants/custom_snackbar.dart';
+export '../../../../core/network/connectivity_service.dart';
+export '../../features/breeds/domain/entities/breed_entity.dart';

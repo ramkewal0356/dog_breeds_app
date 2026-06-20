@@ -3,8 +3,6 @@ import 'package:equatable/equatable.dart';
 import '../../../../core/error/exceptions.dart';
 import 'breed_model.dart';
 
-/// Represents a paginated response from the Dog Breeds API.
-/// Parses the full JSON:API response including data, links, and meta.
 class PaginatedBreedResponse extends Equatable {
   final List<BreedModel> breeds;
   final int currentPage;
@@ -38,8 +36,7 @@ class PaginatedBreedResponse extends Equatable {
       // Parse breed data array
       final dataList = json['data'] as List<dynamic>? ?? [];
       final breeds = dataList
-          .map((item) =>
-              BreedModel.fromJsonApi(item as Map<String, dynamic>))
+          .map((item) => BreedModel.fromJsonApi(item as Map<String, dynamic>))
           .toList();
 
       // Parse pagination metadata

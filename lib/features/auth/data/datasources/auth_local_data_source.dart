@@ -3,42 +3,25 @@ import 'package:hive/hive.dart';
 import 'package:dog_breed_app/core/error/exceptions.dart';
 import 'package:dog_breed_app/features/auth/data/models/user_model.dart';
 
-/// Abstract contract for auth-related local storage operations.
-///
-/// Provides user CRUD on the "users" Hive box and session management
-/// on the "session" Hive box.
 abstract class AuthLocalDataSource {
-  /// Retrieves a user by [username] from the users box.
-  /// Returns `null` if the user does not exist.
   Future<UserModel?> getUser(String username);
 
-  /// Saves a [user] to the users box, keyed by username.
   Future<void> saveUser(UserModel user);
 
-  /// Retrieves the currently stored session user.
-  /// Returns `null` if no session exists.
   Future<UserModel?> getSession();
 
-  /// Persists a session for the given [user].
   Future<void> saveSession(UserModel user);
 
-  /// Removes the current session from storage.
   Future<void> clearSession();
 }
 
-/// Hive-backed implementation of [AuthLocalDataSource].
-///
-/// Receives pre-opened Hive boxes via constructor injection for testability.
 class AuthLocalDataSourceImpl implements AuthLocalDataSource {
   final Box<Map> usersBox;
   final Box<Map> sessionBox;
 
   static const String _sessionKey = 'current_user';
 
-  AuthLocalDataSourceImpl({
-    required this.usersBox,
-    required this.sessionBox,
-  });
+  AuthLocalDataSourceImpl({required this.usersBox, required this.sessionBox});
 
   @override
   Future<UserModel?> getUser(String username) async {

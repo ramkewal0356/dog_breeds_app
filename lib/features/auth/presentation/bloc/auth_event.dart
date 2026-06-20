@@ -13,15 +13,11 @@ class CheckSessionEvent extends AuthEvent {
   const CheckSessionEvent();
 }
 
-/// Event to login (or auto-register) with the given credentials.
 class LoginEvent extends AuthEvent {
   final String username;
   final String password;
 
-  const LoginEvent({
-    required this.username,
-    required this.password,
-  });
+  const LoginEvent({required this.username, required this.password});
 
   @override
   List<Object?> get props => [username, password];
